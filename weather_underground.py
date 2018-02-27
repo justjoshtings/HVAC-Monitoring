@@ -13,6 +13,9 @@ current_dt = datetime.datetime.now()
 print(current_dt)
 start_time = time.time()
 
+#info prompt
+build = str(input("Which building is this for: "))
+
 #how_long fn: prompt how long period of days and does some formatting with datetime
 day_list = wufunc.how_long() #delta_day, d1dstr, d1mstr, d1yr, d2dstr, d2mstr, d2yr
 temp_list_master = [0]*day_list[0]
@@ -44,11 +47,14 @@ for i in range(0,day_list[0]):
 	# data_list = list(wu_data["history"]["observations"][0].keys())
 	# print(data_list)
 
-print(temp_list_master)
+#more formatting into more workable lists
+temp_actual, date_actual = wufunc.format_fn(temp_list_master, day_list)
 
-#plot od temp fn
-# day_list_master = wufunc.od_temp_plot(temp_list_master, day_list)
-# print(day_list_master)
+#info prompt
+st_pt_list = wufunc.setpoint_fn(day_list)
+
+#plot od temp fn: plotting dates and temp
+wufunc.od_temp_plot_fn(temp_actual, date_actual, build, st_pt_list)
 
 #end time
 end_time = time.time()

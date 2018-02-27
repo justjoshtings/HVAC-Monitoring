@@ -1,6 +1,6 @@
 import datetime
-import matplotlib
-
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
 #function to prompt user: period of days
 def how_long():
@@ -43,12 +43,60 @@ def parse_json(counter_in, data_in):
 		temp_list["temp"][i] = data_in["history"]["observations"][i]['tempi']
 	return temp_list #(pretty,year,month,day,hour,mins,temp)
 
-	#plot temp vs time
-def od_temp_plot(temp_list_master, day_list):
-	day_list_master = [0]*day_list[0]
+# formatting into better lists
+def format_fn(temp_list_master, day_list):
+	temp_actual = [0]*(day_list[0]*24)
+	hours_actual = [0]*(day_list[0]*24)
+	year_actual = [0]*(day_list[0]*24)
+	months_actual = [0]*(day_list[0]*24)
+	days_actual = [0]*(day_list[0]*24)
+	print(day_list[0])
+	print(len(temp_actual))
+	counter = 0
 	for i in range(0,day_list[0]):
-			day_list_master[i] = temp_list_master[]
-	return day_list_master
+		for j in range(0,24):
+			temp_actual[counter] = temp_list_master[i]["temp"][j] #list of all temps for all days
+			hours_actual[counter] = temp_list_master[i]["hour"][j]
+			year_actual[counter] = temp_list_master[i]["year"][j]
+			months_actual[counter] = temp_list_master[i]["month"][j]
+			days_actual[counter] = temp_list_master[i]["day"][j]
+			counter += 1
+	date_actual = [0]*(day_list[0]*24)
+	for k in range(0,day_list[0]*24):
+		date_actual[k] = datetime.datetime(int(year_actual[k]), int(months_actual[k]), int(days_actual[k]), int(hours_actual[k]), 0, 0)
+	return temp_actual, date_actual
 
-# uhhhh how to plot x axis time and y axis date, for time use date time and + days loop
-#temp idk yet but great job yesterday! :)
+def setpoint_fn(day_list):
+	try:
+		st_pt = float(input("Enter setpoint: "))
+	except ValueError:
+		raise ValueError ("Enter a number!")
+	except Exception:
+		raise Exception ("Unknown error entering setpoint")
+	st_pt_list = [0]*(day_list[0]*25)
+	for i in range(0,(day_list[0]*25)):
+		st_pt_list[i] = st_pt
+	return st_pt_list
+
+#plotting date and temp
+def od_temp_plot_fn(temp_actual, date_actual, build, st_pt_list):
+	fig, ax = plt.subplots(1)
+	fig.autofmt_xdate()
+	plt.plot(date_actual, temp_actual, c='#FB5633', label="Outdoor Temp")
+	plt.plot(date_actual, st_pt_list, c='#000000', label="Setpoint Temp")
+
+	xfmt = mdates.DateFormatter('%d-%m-%y %H:%M')
+	ax.xaxis.set_major_formatter(xfmt)
+
+	max_day = len(date_actual)-1
+	plt.title("{:s} for {:02d}/{:02d}/{:02d} to {:02d}/{:02d}/{:02d}".format(build, date_actual[0].day, date_actual[0].month, date_actual[0].year,date_actual[max_day].day, date_actual[max_day].month, date_actual[max_day].year), fontsize = 15)
+	plt.ylabel(r'Temperature ($^\circ$F)', fontsize = 10)
+	# plt.grid(True)
+
+	# plt.ylim(0,80)
+	# ax.set_ylim(0,80)
+
+	plt.show()
+
+#plot: cutoff, indoor temp, boiler on?
+# temp idk yet but great job yesterday!
